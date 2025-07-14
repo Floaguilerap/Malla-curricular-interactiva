@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Malla Curricular Interactiva</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
+    h2 { margin-top: 40px; }
+    .semestre {
+      margin-bottom: 30px;
+      padding: 10px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .courses {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .course {
+      padding: 10px 15px;
+      border: 2px solid #444;
+      border-radius: 6px;
+      background-color: #eee;
+      cursor: pointer;
+      user-select: none;
+      min-width: 200px;
+      text-align: center;
+    }
+    .unlocked {
+      background-color: #4caf50;
+      color: white;
+      border-color: #2e7d32;
+    }
+    .locked {
+      background-color: #ccc;
+      color: #666;
+      cursor: not-allowed;
+    }
+    .correq {
+      border: 2px dashed #ffa726;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Malla Curricular Interactiva - Semestres 1 y 2</h1>
+
+<div class="semestre">
+  <h2>Semestre 1</h2>
+  <div class="courses">
+    <div class="course unlocked" id="MAT1610">MAT1610 - Cálculo I</div>
+    <div class="course unlocked" id="QIM100E">QIM100E - Química</div>
+    <div class="course unlocked" id="MAT1203">MAT1203 - Álgebra Lineal</div>
+    <div class="course unlocked" id="ING1004">ING1004 - Desafíos Ing.</div>
+    <div class="course unlocked" id="FIL2001">FIL2001 - Filosofía</div>
+  </div>
+</div>
+
+<div class="semestre">
+  <h2>Semestre 2</h2>
+  <div class="courses">
+    <div class="course locked" id="MAT1620">MAT1620 - Cálculo II</div>
+    <div class="course locked correq" id="FIS1514">FIS1514 - Dinámica</div>
+    <div class="course locked correq" id="FIS0154">FIS0154 - Lab Dinámica</div>
+    <div class="course locked correq" id="ICS1513">ICS1513 - Intro Economía</div>
+    <div class="course unlocked" id="IIC1103">IIC1103 - Intro Prog.</div>
+    <div class="course unlocked" id="TEOLOGIA">Formación Teológica</div>
+  </div>
+</div>
+
+<script>
+  const cursos = {
+    MAT1610: { unlocked: true, prereqs: [] },
+    QIM100E: { unlocked: true, prereqs: [] },
+    MAT1203: { unlocked: true, prereqs: [] },
+    ING1004: { unlocked: true, prereqs: [] },
+    FIL2001: { unlocked: true, prereqs: [] },
+    
+    MAT1620: { unlocked: false, prereqs: ['MAT1610'] },
+    FIS1514: { unlocked: false, prereqs: ['MAT1610'], correqs: ['MAT1203', 'FIS0154'] },
+    FIS0154: { unlocked: false, prereqs: [], correqs: ['FIS1514'] },
+    ICS1513: { unlocked: false, prereqs: [], correqs: ['MAT1620'] },
+    IIC1103: { unlocked: true, prereqs: [] },
+    TEOLOGIA: { unlocked: true, prereqs: [] }
+  };
+
+  function puedeDesbloquear(id) {
+    const { prereqs = [] } = cursos[id];
+    return prereqs.every(pr => cursos[pr].unlocked);
+  }
+
+  function actualizarEstado() {
+    for (let id in cursos) {
+      const curso = document.getElementById(id);
+      if (cursos[id].unlocked) {
+        curso.classList.remove('locked');
+        curso.classList.add('unlocked');
+      } else {
+        curso.classList.add('locked');
+        curso.classList.remove('unlocked');
+      }
+    }
+  }
+
+  document.querySelectorAll('.course').forEach(elem => {
+    elem.addEventListener('click', () => {
+      const id = elem.id;
+      if (!cursos[id].unlocked && puedeDesbloquear(id)) {
+        cursos[id].unlocked = true;
+        actualizarEstado();
+      } else if (!cursos[id].unlocked) {
+        alert('No puedes desbloquear este curso aún. Faltan prerrequisitos.');
+      }
+    });
+  });
+
+  actualizarEstado();
+</script>
+
+</body>
+</html>
